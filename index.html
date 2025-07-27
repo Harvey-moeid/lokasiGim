@@ -13,9 +13,6 @@
       font-family: 'Inter', sans-serif;
       background-color: #f0f4f8;
     }
-    .status-low { background-color: #FECACA; color: #991B1B; }
-    .status-medium { background-color: #FEF3C7; color: #92400E; }
-    .status-good { background-color: #D1FAE5; color: #065F46; }
     .fade-in { animation: fadeIn 0.5s ease-in-out; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     .hover-row:hover { background-color: #EFF6FF; transition: background-color 0.2s; }
@@ -32,7 +29,6 @@
       #mobileTable { display: block; }
     }
     @media (min-width: 641px) { #mobileTable { display: none; } }
-    /* Pagination mobile-friendly */
     .pagination-btn { min-width: 44px; min-height: 44px; font-size: 1rem; }
   </style>
 </head>
@@ -176,7 +172,6 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
                 </svg>
               </th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200" id="tableBody">
@@ -211,7 +206,6 @@
     </div>
   </div>
   <script>
-    // --- Konfigurasi Spreadsheet ---
     const SHEET_ID = "1kWuc2yMEAeeHQkC5sVvGdNEwH8YLpif2aIQL8qzF3ds";
     const SHEET_NAME = "Sheet1";
     const API_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME}`;
@@ -226,13 +220,12 @@
     let lastUpdateValue = '-';
 
     function fetchLastUpdateTime() {
-      // Mengambil dari cell G1
       fetch(LAST_UPDATE_CELL_URL)
         .then(res => res.text())
         .then(data => {
           try {
             const json = JSON.parse(data.substr(47).slice(0, -2));
-            const val = json.table.rows[0]?.c[0]?.v || '-';
+            let val = json.table.rows[0]?.c[0]?.v || '-';
             lastUpdateValue = val;
             document.getElementById('updateTime').textContent = val;
             document.getElementById('updateTimeMobile').textContent = val;
@@ -278,8 +271,7 @@
                   nama: nama,
                   palet: palet,
                   lokasi: lokasi,
-                  stok: parseInt(stok) || 0,
-                  status: getStockStatus(parseInt(stok) || 0)
+                  stok: parseInt(stok) || 0
                 });
                 if (lokasi) uniqueLocations.add(lokasi);
               }
@@ -309,19 +301,6 @@
         });
     }
 
-    function getStockStatus(stok) {
-      if (stok <= 10) return 'low';
-      if (stok <= 30) return 'medium';
-      return 'good';
-    }
-    function getStatusLabel(status) {
-      switch (status) {
-        case 'low': return `<span class="px-2 py-1 text-xs rounded-full status-low font-medium">Rendah</span>`;
-        case 'medium': return `<span class="px-2 py-1 text-xs rounded-full status-medium font-medium">Sedang</span>`;
-        case 'good': return `<span class="px-2 py-1 text-xs rounded-full status-good font-medium">Baik</span>`;
-        default: return '';
-      }
-    }
     function updateLocationFilter() {
       const locationFilter = document.getElementById('locationFilter');
       locationFilter.innerHTML = '<option value="">Semua Lokasi</option>';
@@ -346,7 +325,12 @@
           item.palet.toString().toLowerCase().includes(searchTerm) ||
           item.lokasi.toLowerCase().includes(searchTerm);
         const matchesLocation = locationFilter === '' || item.lokasi === locationFilter;
-        const matchesStockStatus = stockFilter === '' || item.status === stockFilter;
+        // Untuk filter stok, tetap bisa meski tanpa kolom status
+        let status = '';
+        if (item.stok <= 10) status = 'low';
+        else if (item.stok <= 30) status = 'medium';
+        else status = 'good';
+        const matchesStockStatus = stockFilter === '' || status === stockFilter;
         return matchesSearch && matchesLocation && matchesStockStatus;
       });
       filteredData.sort((a, b) => {
@@ -388,8 +372,7 @@
           <td class="px-6 py-4 text-sm text-gray-700">${item.nama}</td>
           <td class="px-6 py-4 text-sm text-gray-700 hidden sm:table-cell">${item.palet}</td>
           <td class="px-6 py-4 text-sm text-gray-700 hidden sm:table-cell">${item.lokasi}</td>
-          <td class="px-6 py-4 text-sm font-medium ${item.status === 'low' ? 'text-red-600' : item.status === 'medium' ? 'text-yellow-600' : 'text-green-600'}">${item.stok}</td>
-          <td class="px-6 py-4 text-sm text-gray-700">${getStatusLabel(item.status)}</td>
+          <td class="px-6 py-4 text-sm font-medium text-gray-600">${item.stok}</td>
         `;
         tableBody.appendChild(row);
       });
@@ -398,11 +381,11 @@
       pageData.forEach(item => {
         mobileTable.innerHTML += `
           <div class="bg-white p-4 rounded-lg shadow border flex flex-col space-y-2">
-            <div class="flex justify-between"><span class="font-bold">${item.nama}</span> <span>${getStatusLabel(item.status)}</span></div>
+            <div class="font-bold">${item.nama}</div>
             <div>ID: <span class="font-mono text-xs">${item.id}</span></div>
             <div>Lokasi: <span>${item.lokasi}</span></div>
             <div>No Palet: <span>${item.palet}</span></div>
-            <div>Stok: <span class="${item.status === 'low' ? 'text-red-600' : item.status === 'medium' ? 'text-yellow-600' : 'text-green-600'} font-bold">${item.stok}</span></div>
+            <div>Stok: <span class="font-bold">${item.stok}</span></div>
           </div>
         `;
       });
@@ -457,7 +440,6 @@
     // Export PDF hanya data yang terfilter & tersort!
     document.getElementById('exportPdfBtn').addEventListener('click', exportToPDF);
     function exportToPDF() {
-      // Gunakan filteredData, lalu ambil hanya data di halaman yang sedang tampil
       const startIndex = (currentPage - 1) * itemsPerPage;
       const endIndex = Math.min(startIndex + itemsPerPage, filteredData.length);
       const pageData = filteredData.slice(startIndex, endIndex);
@@ -477,7 +459,6 @@
       });
       doc.save('stok-gudang.pdf');
     }
-    // Event listeners
     document.addEventListener('DOMContentLoaded', () => {
       loadSheetData();
       fetchLastUpdateTime();
