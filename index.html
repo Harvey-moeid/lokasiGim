@@ -52,94 +52,44 @@
         </div>
       </div>
     </div>
-    <!-- Dashboard Summary -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-4 p-4 md:p-6 bg-gray-50 border-b">
-      <div class="bg-white p-3 md:p-4 rounded-lg shadow-sm border border-gray-100">
-        <div class="flex justify-between items-center">
-          <div>
-            <p class="text-gray-500 text-xs md:text-sm">Total Produk</p>
-            <h3 id="totalProducts" class="text-xl md:text-2xl font-bold">-</h3>
-          </div>
-          <div class="bg-blue-100 p-2 md:p-3 rounded-full">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 md:h-6 md:w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10" />
-            </svg>
-          </div>
-        </div>
-      </div>
-      <div class="bg-white p-3 md:p-4 rounded-lg shadow-sm border border-gray-100">
-        <div class="flex justify-between items-center">
-          <div>
-            <p class="text-gray-500 text-xs md:text-sm">Total Stok</p>
-            <h3 id="totalStock" class="text-xl md:text-2xl font-bold">-</h3>
-          </div>
-          <div class="bg-green-100 p-2 md:p-3 rounded-full">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 md:h-6 md:w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-            </svg>
-          </div>
-        </div>
-      </div>
-      <div class="bg-white p-3 md:p-4 rounded-lg shadow-sm border border-gray-100">
-        <div class="flex justify-between items-center">
-          <div>
-            <p class="text-gray-500 text-xs md:text-sm">Lokasi Gudang</p>
-            <h3 id="totalLocations" class="text-xl md:text-2xl font-bold">-</h3>
-          </div>
-          <div class="bg-purple-100 p-2 md:p-3 rounded-full">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 md:h-6 md:w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- Search, Filter, Export -->
-    <div class="p-4 md:p-6">
-      <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4 md:mb-6 space-y-3 md:space-y-0">
-        <div class="relative flex-grow md:max-w-md">
-          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </div>
-          <input type="text" id="search" placeholder="Cari produk, ID, atau lokasi..." 
-                 class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none text-sm md:text-base">
-        </div>
-        <div class="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 w-full md:w-auto">
-          <select id="locationFilter" class="bg-white border border-gray-300 text-gray-700 rounded-lg px-4 py-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none text-sm md:text-base w-full md:w-auto">
-            <option value="">Semua Lokasi</option>
-          </select>
-          <select id="stockFilter" class="bg-white border border-gray-300 text-gray-700 rounded-lg px-4 py-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none text-sm md:text-base w-full md:w-auto">
-            <option value="">Semua Stok</option>
-            <option value="low">Stok Rendah</option>
-            <option value="medium">Stok Sedang</option>
-            <option value="good">Stok Baik</option>
-          </select>
-        </div>
-      </div>
-      <!-- Tombol Export PDF -->
-      <div class="flex flex-col md:flex-row md:justify-end mb-4">
-        <button id="exportPDF" class="bg-red-600 text-white px-4 py-2 rounded-lg shadow hover:bg-red-700 w-full md:w-auto text-base font-medium">
-          Export ke PDF
-        </button>
-      </div>
-      <!-- Table -->
-      <div class="overflow-x-auto rounded-lg border border-gray-200">
-        <table id="stockTable" class="min-w-full divide-y divide-gray-200 text-sm md:text-base">
-          <thead class="bg-gray-50">
-            <tr>
-              <th scope="col" class="px-4 md:px-6 py-3 text-left text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider cursor-pointer" data-sort="id">
-                ID
-              </th>
-              <th scope="col" class="px-4 md:px-6 py-3 text-left text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider cursor-pointer" data-sort="nama">
-                Nama Produk
-              </th>
-              <th scope="col" class="px-4 md:px-6 py-3 text-left text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider cursor-pointer" data-sort="palet">
-                No Palet
-              </th>
-              <th scope="col" class="px-4 md:px-6 py-3 text-left text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider cursor-pointer" data-sort="lokasi">
-                Lokasi
-              </th>
-              <th scope="col" class="px-4 md:px-6 py-3 text-left text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider cursor-pointer" data-sort="stok">
+    <!-- Dashboard Summary, Search, Filter, Export, Table, Pagination -->
+    <!-- ... (bagian lain, sama seperti sebelumnya) ... -->
+    <!-- (SENGAJA DIPOTONG AGAR FOKUS KE BAGIAN JS YANG MENAMPILKAN DATA G1) -->
+  </div>
+  <!-- Script utama -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script>
+    // --- SETTING DARI GSheet ANDA ---
+    const SHEET_ID = "1kWuc2yMEAeeHQkC5sVvGdNEwH8YLpif2aIQL8qzF3ds";
+    const SHEET_NAME = "Sheet1";
+    const API_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME}`;
+    const API_G1 = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&range=G1&sheet=${SHEET_NAME}`;
+    // --- AMBIL DATA G1 UNTUK "TERAKHIR DIPERBARUI" ---
+    function loadLastUpdate() {
+      fetch(API_G1)
+        .then(res => res.text())
+        .then(txt => {
+          const json = JSON.parse(txt.substr(47).slice(0, -2));
+          const value = json.table.rows[0]?.c[0]?.v || '-';
+          document.getElementById('updateTime').textContent = value;
+        })
+        .catch(() => {
+          document.getElementById('updateTime').textContent = "-";
+        });
+    }
+    // --- PANGGIL loadLastUpdate() SETELAH REFRESH ATAU SAAT PERTAMA KALI ---
+    document.addEventListener('DOMContentLoaded', function() {
+      loadLastUpdate();
+      // ...panggil juga loadSheetData() di sini...
+    });
+    // --- TAMBAHKAN loadLastUpdate() JUGA DI TOMBOL REFRESH, CONTOH: ---
+    document.getElementById('refreshBtn').addEventListener('click', function() {
+      loadLastUpdate();
+      // ...panggil juga loadSheetData() di sini...
+    });
+    // --- SELANJUTNYA, KODE LAIN SEPERTI LOAD DATA, EXPORT PDF, DST (SAMA SEPERTI JAWABAN SEBELUMNYA) ---
+    // ... 
+  </script>
+</body>
+</html>
