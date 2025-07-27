@@ -21,6 +21,10 @@
       animation: spin 1s linear infinite; margin: 0 auto;
     }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    @media print {
+      body { background: #fff !important; }
+      .shadow, .rounded-xl { box-shadow: none !important; border-radius: 0 !important; }
+    }
   </style>
 </head>
 <body class="p-2 md:p-6">
@@ -39,14 +43,15 @@
             <p class="text-blue-100 text-sm md:text-base">MUID PPIC</p>
           </div>
         </div>
-        <div class="flex items-center">
-          <button id="refreshBtn" class="bg-white text-blue-700 px-3 md:px-4 py-2 rounded-lg shadow flex items-center hover:bg-blue-50 transition-colors text-sm md:text-base">
+        <div class="flex flex-col md:flex-row md:items-center">
+          <button id="refreshBtn" class="bg-white text-blue-700 px-3 md:px-4 py-2 rounded-lg shadow flex items-center hover:bg-blue-50 transition-colors text-sm md:text-base mb-2 md:mb-0">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
             Refresh Data
           </button>
-          <div id="lastUpdate" class="text-blue-100 ml-2 md:ml-4 text-xs md:text-sm hidden md:block">
+          <!-- Tanggal update selalu tampil di mobile & desktop -->
+          <div id="lastUpdate" class="text-blue-100 ml-0 md:ml-4 text-xs md:text-sm block text-center md:text-left">
             Terakhir diperbarui: <span id="updateTime">-</span>
           </div>
         </div>
@@ -126,7 +131,7 @@
         </button>
       </div>
       <!-- Table -->
-      <div class="overflow-x-auto rounded-lg border border-gray-200">
+      <div class="overflow-x-auto rounded-lg border border-gray-200" id="tableExportContainer">
         <table id="stockTable" class="min-w-full divide-y divide-gray-200 text-sm md:text-base">
           <thead class="bg-gray-50">
             <tr>
@@ -215,7 +220,6 @@
 
             allData = [];
             uniqueLocations = new Set();
-            // Lewati jika baris adalah header (cek jika ada label "ID" dsb)
             rows.forEach(row => {
               if (row.c && row.c[0]?.v !== "ID" && row.c[1]?.v !== "Nama Produk") {
                 let id = row.c[0]?.v || "";
@@ -474,19 +478,25 @@
           applyFiltersAndSort();
         });
       });
+
+      // Export hanya bagian tabel (thead + tbody)
       document.getElementById('exportPDF').addEventListener('click', function () {
-        const table = document.getElementById('stockTable');
-        html2canvas(table).then(canvas => {
+        const tableContainer = document.getElementById('tableExportContainer');
+        tableContainer.style.background = '#fff'; // background putih supaya rapi
+        window.scrollTo(0, 0);
+        html2canvas(tableContainer, { scale: 2, useCORS: true }).then(canvas => {
           const imgData = canvas.toDataURL('image/png');
           const pdf = new window.jspdf.jsPDF({
-            orientation: 'landscape',
-            unit: 'pt',
+            orientation: canvas.width > canvas.height ? 'landscape' : 'portrait',
+            unit: 'px',
             format: [canvas.width, canvas.height]
           });
           pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
-          pdf.save('stok-gim.pdf');
+          pdf.save('tabel-stok-gim.pdf');
+          tableContainer.style.background = '';
         });
       });
+
     });
   </script>
 </body>
