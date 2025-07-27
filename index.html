@@ -110,10 +110,6 @@
         </div>
       </div>
     </div>
-    <!-- Last update (mobile & desktop, visible everywhere) -->
-     id="lastUpdateMobile" style="display: none;">
-      Terakhir diperbarui: <span id="updateTimeMobile">-</span>
-   
     <!-- Search and Filter -->
     <div class="p-2 md:p-6">
       <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6 space-y-4 md:space-y-0">
@@ -228,15 +224,11 @@
             let val = json.table.rows[0]?.c[0]?.v || '-';
             lastUpdateValue = val;
             document.getElementById('updateTime').textContent = val;
-            document.getElementById('updateTimeMobile').textContent = val;
-            document.getElementById('lastUpdateMobile').style.display = 'block';
           } catch {
             document.getElementById('updateTime').textContent = '-';
-            document.getElementById('updateTimeMobile').textContent = '-';
           }
         }).catch(() => {
           document.getElementById('updateTime').textContent = '-';
-          document.getElementById('updateTimeMobile').textContent = '-';
         });
     }
 
