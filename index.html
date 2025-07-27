@@ -5,40 +5,42 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Monitoring Stok Gudang</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- jsPDF dan autoTable -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.7.0/jspdf.plugin.autotable.min.js"></script>
   <style>
     body {
       font-family: 'Inter', sans-serif;
-      background-color: #f0f4f8;
+      background: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 100%);
+      min-height: 100vh;
     }
-    .fade-in { animation: fadeIn 0.5s ease-in-out; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    .hover-row:hover { background-color: #EFF6FF; transition: background-color 0.2s; }
+    .glass {
+      background: rgba(255,255,255,0.8);
+      box-shadow: 0 4px 24px 0 rgba(30,41,59,0.08);
+      backdrop-filter: blur(3px);
+    }
+    .fade-in { animation: fadeIn .6s cubic-bezier(.4,0,.2,1);}
+    @keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
+    .hover-row:hover {background-color: #F3F4F6; transition:.2s;}
     .loading-spinner {
-      border: 3px solid rgba(0, 0, 0, 0.1);
-      border-top: 3px solid #3498db;
+      border: 3px solid rgba(0,0,0,0.1);
+      border-top: 3px solid #6366f1;
       border-radius: 50%;
       width: 24px; height: 24px;
-      animation: spin 1s linear infinite; margin: 0 auto;
+      animation: spin 1s linear infinite; margin:0 auto;
     }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    @media (max-width: 640px) {
-      table { display: none !important; }
-      #mobileTable { display: block; }
-    }
-    @media (min-width: 641px) { #mobileTable { display: none; } }
-    .pagination-btn { min-width: 44px; min-height: 44px; font-size: 1rem; }
+    @keyframes spin { 0%{transform:rotate(0);} 100%{transform:rotate(360deg);} }
+    @media (max-width:640px){table{display:none!important;} #mobileTable{display:block;}}
+    @media (min-width:641px){#mobileTable{display:none;}}
+    .pagination-btn { min-width: 40px; min-height: 40px; font-size: 1rem;}
   </style>
 </head>
 <body class="p-2 md:p-6">
-  <div class="max-w-6xl mx-auto bg-white rounded-xl shadow-md overflow-hidden">
+  <div class="max-w-6xl mx-auto glass rounded-2xl overflow-hidden">
     <!-- Header -->
-    <div class="bg-gradient-to-r from-blue-600 to-blue-800 p-6">
+    <div class="bg-gradient-to-r from-indigo-600 to-blue-700 p-6">
       <div class="flex flex-col md:flex-row justify-between items-center">
         <div class="flex items-center mb-4 md:mb-0">
-          <div class="bg-gradient-to-tr from-blue-500 via-purple-500 to-pink-400 p-1 rounded-full shadow-md mr-4">
+          <div class="bg-gradient-to-tr from-blue-500 via-indigo-500 to-pink-400 p-1 rounded-full shadow-lg mr-4">
             <!-- Modern SVG Logo -->
             <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
               <defs>
@@ -55,18 +57,12 @@
             </svg>
           </div>
           <div>
-            <h1 class="text-2xl font-bold text-white">Monitoring Stok Gudang</h1>
-            <p class="text-blue-100 text-xs md:text-sm">Terhubung dengan Google Sheets</p>
+            <h1 class="text-3xl font-extrabold text-white tracking-tight drop-shadow-sm">Monitoring Stok Gudang</h1>
+            <p class="text-blue-100 text-xs md:text-sm mt-1">Terhubung dengan Google Sheets</p>
           </div>
         </div>
         <div class="flex items-center">
-          <button id="refreshBtn" class="bg-white text-blue-700 px-4 py-2 rounded-lg shadow flex items-center hover:bg-blue-50 transition-colors text-sm md:text-base">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
-            Refresh Data
-          </button>
-          <div id="lastUpdate" class="text-blue-100 ml-4 text-xs md:text-sm block">
+          <div id="lastUpdate" class="text-blue-100 ml-0 md:ml-4 text-xs md:text-sm block">
             Terakhir diperbarui: <span id="updateTime">-</span>
           </div>
         </div>
@@ -74,24 +70,24 @@
     </div>
     <!-- Dashboard Summary -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-6 bg-gray-50 border-b">
-      <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+      <div class="bg-white glass p-5 rounded-xl shadow-sm border border-gray-100">
         <div class="flex justify-between items-center">
           <div>
-            <p class="text-gray-500 text-sm">Total Produk</p>
-            <h3 id="totalProducts" class="text-2xl font-bold">-</h3>
+            <p class="text-gray-500 text-xs">Total Produk</p>
+            <h3 id="totalProducts" class="text-2xl font-extrabold text-indigo-700">-</h3>
           </div>
-          <div class="bg-blue-100 p-3 rounded-full">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div class="bg-indigo-100 p-3 rounded-full">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10" />
             </svg>
           </div>
         </div>
       </div>
-      <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+      <div class="bg-white glass p-5 rounded-xl shadow-sm border border-gray-100">
         <div class="flex justify-between items-center">
           <div>
-            <p class="text-gray-500 text-sm">Total Stok</p>
-            <h3 id="totalStock" class="text-2xl font-bold">-</h3>
+            <p class="text-gray-500 text-xs">Total Stok</p>
+            <h3 id="totalStock" class="text-2xl font-extrabold text-green-700">-</h3>
           </div>
           <div class="bg-green-100 p-3 rounded-full">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -100,11 +96,11 @@
           </div>
         </div>
       </div>
-      <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+      <div class="bg-white glass p-5 rounded-xl shadow-sm border border-gray-100">
         <div class="flex justify-between items-center">
           <div>
-            <p class="text-gray-500 text-sm">Lokasi Gudang</p>
-            <h3 id="totalLocations" class="text-2xl font-bold">-</h3>
+            <p class="text-gray-500 text-xs">Lokasi Gudang</p>
+            <h3 id="totalLocations" class="text-2xl font-extrabold text-purple-700">-</h3>
           </div>
           <div class="bg-purple-100 p-3 rounded-full">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -117,7 +113,7 @@
     </div>
     <!-- Export PDF Centered Button -->
     <div class="flex justify-center my-6">
-      <button id="exportPdfBtn" class="bg-red-600 text-white px-6 py-3 rounded-xl shadow-lg hover:bg-red-700 transition-colors flex items-center text-base font-semibold">
+      <button id="exportPdfBtn" class="bg-gradient-to-r from-pink-500 to-indigo-600 text-white px-7 py-3 rounded-full shadow-xl hover:scale-105 hover:shadow-2xl transition-all duration-200 flex items-center text-lg font-bold gap-2">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
         </svg>
@@ -134,49 +130,45 @@
             </svg>
           </div>
           <input type="text" id="search" placeholder="Cari produk, ID, atau lokasi..." 
-                 class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none">
+                 class="pl-10 pr-4 py-3 w-full border border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none bg-white shadow-sm transition-all">
         </div>
         <div class="flex space-x-2">
-          <select id="locationFilter" class="bg-white border border-gray-300 text-gray-700 rounded-lg px-4 py-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none">
+          <select id="locationFilter" class="bg-white border border-gray-300 text-gray-700 rounded-xl px-4 py-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none shadow-sm">
             <option value="">Semua Lokasi</option>
           </select>
-          <select id="stockFilter" class="bg-white border border-gray-300 text-gray-700 rounded-lg px-4 py-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none">
-            <option value="">Semua Stok</option>
-            <option value="low">Stok Rendah</option>
-            <option value="medium">Stok Sedang</option>
-            <option value="good">Stok Baik</option>
-          </select>
+          <!-- Filter ID: filter berdasarkan ID produk -->
+          <input type="text" id="idFilter" placeholder="Filter ID" class="border border-gray-300 rounded-xl px-4 py-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none shadow-sm w-32">
         </div>
       </div>
-      <div class="overflow-x-auto rounded-lg border border-gray-200">
+      <div class="overflow-x-auto rounded-xl border border-gray-200 glass shadow">
         <table id="stockTable" class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" data-sort="id">
+              <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider cursor-pointer" data-sort="id">
                 ID
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
                 </svg>
               </th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" data-sort="nama">
+              <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider cursor-pointer" data-sort="nama">
                 Nama Produk
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
                 </svg>
               </th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hidden sm:table-cell" data-sort="palet">
+              <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider cursor-pointer hidden sm:table-cell" data-sort="palet">
                 No Palet
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
                 </svg>
               </th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hidden sm:table-cell" data-sort="lokasi">
+              <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider cursor-pointer hidden sm:table-cell" data-sort="lokasi">
                 Lokasi
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
                 </svg>
               </th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" data-sort="stok">
+              <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider cursor-pointer" data-sort="stok">
                 Jumlah Stok
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
@@ -216,7 +208,7 @@
     </div>
   </div>
   <script>
-    // ... Seluruh JS Anda tetap sama, tidak perlu diubah ...
+    // Variabel & URL Google Sheet sama
     const SHEET_ID = "1kWuc2yMEAeeHQkC5sVvGdNEwH8YLpif2aIQL8qzF3ds";
     const SHEET_NAME = "Sheet1";
     const API_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME}`;
@@ -324,7 +316,8 @@
     function applyFiltersAndSort() {
       const searchTerm = document.getElementById('search').value.toLowerCase();
       const locationFilter = document.getElementById('locationFilter').value;
-      const stockFilter = document.getElementById('stockFilter').value;
+      // Custom: Filter ID
+      const idFilter = document.getElementById('idFilter').value.trim().toLowerCase();
       filteredData = allData.filter(item => {
         const matchesSearch = 
           item.id.toString().toLowerCase().includes(searchTerm) ||
@@ -332,12 +325,8 @@
           item.palet.toString().toLowerCase().includes(searchTerm) ||
           item.lokasi.toLowerCase().includes(searchTerm);
         const matchesLocation = locationFilter === '' || item.lokasi === locationFilter;
-        let status = '';
-        if (item.stok <= 10) status = 'low';
-        else if (item.stok <= 30) status = 'medium';
-        else status = 'good';
-        const matchesStockStatus = stockFilter === '' || status === stockFilter;
-        return matchesSearch && matchesLocation && matchesStockStatus;
+        const matchesId = idFilter === '' || item.id.toString().toLowerCase().includes(idFilter);
+        return matchesSearch && matchesLocation && matchesId;
       });
       filteredData.sort((a, b) => {
         const aValue = a[currentSort.column];
@@ -374,11 +363,11 @@
         const row = document.createElement('tr');
         row.className = 'hover-row fade-in';
         row.innerHTML = `
-          <td class="px-6 py-4 text-sm font-medium text-gray-900">${item.id}</td>
+          <td class="px-6 py-4 text-sm font-semibold text-indigo-900">${item.id}</td>
           <td class="px-6 py-4 text-sm text-gray-700">${item.nama}</td>
           <td class="px-6 py-4 text-sm text-gray-700 hidden sm:table-cell">${item.palet}</td>
           <td class="px-6 py-4 text-sm text-gray-700 hidden sm:table-cell">${item.lokasi}</td>
-          <td class="px-6 py-4 text-sm font-medium text-gray-600">${item.stok}</td>
+          <td class="px-6 py-4 text-sm font-bold text-blue-500">${item.stok}</td>
         `;
         tableBody.appendChild(row);
       });
@@ -386,12 +375,12 @@
       mobileTable.innerHTML = '';
       pageData.forEach(item => {
         mobileTable.innerHTML += `
-          <div class="bg-white p-4 rounded-lg shadow border flex flex-col space-y-2">
-            <div class="font-bold">${item.nama}</div>
+          <div class="bg-white glass p-4 rounded-xl shadow border flex flex-col space-y-2">
+            <div class="font-bold text-indigo-600">${item.nama}</div>
             <div>ID: <span class="font-mono text-xs">${item.id}</span></div>
             <div>Lokasi: <span>${item.lokasi}</span></div>
             <div>No Palet: <span>${item.palet}</span></div>
-            <div>Stok: <span class="font-bold">${item.stok}</span></div>
+            <div>Stok: <span class="font-extrabold text-blue-500">${item.stok}</span></div>
           </div>
         `;
       });
@@ -408,7 +397,7 @@
         const button = document.createElement('button');
         button.textContent = pageNum;
         button.className = pageNum === currentPage 
-          ? 'pagination-btn px-2 py-1 bg-blue-600 text-white rounded-md text-sm' 
+          ? 'pagination-btn px-2 py-1 bg-indigo-600 text-white rounded-md text-sm' 
           : 'pagination-btn px-2 py-1 border border-gray-300 rounded-md text-sm hover:bg-gray-50';
         button.addEventListener('click', () => {
           currentPage = pageNum;
@@ -420,7 +409,7 @@
       function addEllipsis() {
         const ellipsis = document.createElement('span');
         ellipsis.textContent = '...';
-        ellipsis.className = 'px-2 py-1 text-gray-500';
+        ellipsis.className = 'px-2 py-1 text-gray-400';
         pageNumbers.appendChild(ellipsis);
       }
       if (totalPages <= 5) {
@@ -443,7 +432,6 @@
         }
       }
     }
-    // Export PDF hanya data yang terfilter & tersort!
     document.getElementById('exportPdfBtn').addEventListener('click', exportToPDF);
     function exportToPDF() {
       const startIndex = (currentPage - 1) * itemsPerPage;
@@ -470,11 +458,7 @@
       fetchLastUpdateTime();
       document.getElementById('search').addEventListener('input', applyFiltersAndSort);
       document.getElementById('locationFilter').addEventListener('change', applyFiltersAndSort);
-      document.getElementById('stockFilter').addEventListener('change', applyFiltersAndSort);
-      document.getElementById('refreshBtn').addEventListener('click', () => {
-        loadSheetData();
-        fetchLastUpdateTime();
-      });
+      document.getElementById('idFilter').addEventListener('input', applyFiltersAndSort);
       document.getElementById('prevPage').addEventListener('click', () => {
         if (currentPage > 1) {
           currentPage--;
