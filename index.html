@@ -38,9 +38,20 @@
     <div class="bg-gradient-to-r from-blue-600 to-blue-800 p-6">
       <div class="flex flex-col md:flex-row justify-between items-center">
         <div class="flex items-center mb-4 md:mb-0">
-          <div class="bg-white p-2 rounded-lg shadow-md mr-4">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+          <div class="bg-gradient-to-tr from-blue-500 via-purple-500 to-pink-400 p-1 rounded-full shadow-md mr-4">
+            <!-- Modern SVG Logo -->
+            <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+              <defs>
+                <linearGradient id="logo-gradient" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#0ea5e9"/>
+                  <stop offset="100%" stop-color="#a21caf"/>
+                </linearGradient>
+              </defs>
+              <circle cx="24" cy="24" r="22" fill="#fff" stroke="url(#logo-gradient)" stroke-width="4"/>
+              <g>
+                <rect x="17" y="17" width="14" height="14" rx="4" fill="url(#logo-gradient)" />
+                <circle cx="24" cy="24" r="4" fill="#fff"/>
+              </g>
             </svg>
           </div>
           <div>
@@ -54,12 +65,6 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
             Refresh Data
-          </button>
-          <button id="exportPdfBtn" class="ml-2 bg-red-600 text-white px-4 py-2 rounded-lg shadow hover:bg-red-700 transition-colors flex items-center text-sm md:text-base">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
-            Export PDF
           </button>
           <div id="lastUpdate" class="text-blue-100 ml-4 text-xs md:text-sm block">
             Terakhir diperbarui: <span id="updateTime">-</span>
@@ -90,7 +95,7 @@
           </div>
           <div class="bg-green-100 p-3 rounded-full">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 002-2" />
             </svg>
           </div>
         </div>
@@ -109,6 +114,15 @@
           </div>
         </div>
       </div>
+    </div>
+    <!-- Export PDF Centered Button -->
+    <div class="flex justify-center my-6">
+      <button id="exportPdfBtn" class="bg-red-600 text-white px-6 py-3 rounded-xl shadow-lg hover:bg-red-700 transition-colors flex items-center text-base font-semibold">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+        Export PDF
+      </button>
     </div>
     <!-- Search and Filter -->
     <div class="p-2 md:p-6">
@@ -202,6 +216,7 @@
     </div>
   </div>
   <script>
+    // ... Seluruh JS Anda tetap sama, tidak perlu diubah ...
     const SHEET_ID = "1kWuc2yMEAeeHQkC5sVvGdNEwH8YLpif2aIQL8qzF3ds";
     const SHEET_NAME = "Sheet1";
     const API_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME}`;
@@ -317,7 +332,6 @@
           item.palet.toString().toLowerCase().includes(searchTerm) ||
           item.lokasi.toLowerCase().includes(searchTerm);
         const matchesLocation = locationFilter === '' || item.lokasi === locationFilter;
-        // Untuk filter stok, tetap bisa meski tanpa kolom status
         let status = '';
         if (item.stok <= 10) status = 'low';
         else if (item.stok <= 30) status = 'medium';
